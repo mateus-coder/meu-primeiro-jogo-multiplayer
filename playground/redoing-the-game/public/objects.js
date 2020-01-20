@@ -193,7 +193,7 @@ Game.prototype.removePlayer = function(command) {
     })
 }
 
-Game.prototype.movePlayer = function() {
+Game.prototype.movePlayer = function(command) {
     notifyAll(command)
 
     const acceptedMoves = {
@@ -232,3 +232,55 @@ Game.prototype.movePlayer = function() {
     }
 }
 
+
+Game.prototype.verifyStateGame = function (playerId) {
+    let char = this.searchThing({
+                                    playerId : playerId,
+                                    arranjoEspec : this.players
+                                 })
+    this.contadorDeTempo === this.delayMudancaDeCor ? this.Animations() : this.delayMudancaDeCor++;
+		//define as ações com base no estado do jogo
+		switch(this.gameState){
+			case this.LOADING:
+				console.log('LOADING...');
+				break;
+			case this.PLAYING:
+				update();
+				break;
+			case this.OVER:
+				break;
+			case this.PAUSED:
+				break;
+		}
+		const playerGameState = {
+			PAUSED : () => {
+				char.contadorDePausa += 1;
+				char.contadorDePausa === 1 ? this.createScenePause(true) : this.updatePause();
+			},
+			PLAYING : () => {
+				//update();
+				char.contadorDePausa = 0;
+				
+			},
+			WIN : () => {
+				char.status = "INVISIBLE";
+				//removeInvisibleObjects(game.sprites, game.players);
+				this.gameState = this.OVER;
+				char.contadorDeWin += 1;
+				char.contadorDeWin === 1 ? this.createSceneWin() : this.updateWin();
+			},
+			LOSE : () => {
+				char.status = "INVISIBLE";
+				//removeInvisibleObjects(game.sprites, game.players);
+				this.gameState = this.OVER;
+				char.contadorDeLose += 1;
+				char.contadorDeLose === 1 ? this.createSceneLose() : this.updateLose();
+			},
+			INIT : () => {
+				char.contadorDePausa += 1;
+				char.contadorDePausa === 1 ? this.createScenePause(false) : this.updatePause();
+				
+			}
+		}
+		playerGameState[`${char.gameState}`]();
+}

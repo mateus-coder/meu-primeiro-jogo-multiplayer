@@ -9,7 +9,7 @@
 
         <script type="module">
             import createKeyboardListener from './keyboard-listener.js'
-            import renderScreen from './render-screen.js'
+            import renderScreenLoop from './render-screen.js'
             import Game from './objects.js'
 
             const initGame = {
@@ -18,10 +18,24 @@
                 },
                 createListener : () => {
                     return new createKeyboardListener();
+                },
+                loadHandler : () => {
+                    game.loadedAssets++;
+                    if(game.loadedAssets === game.assetsToLoad.length){
+                        img.removeEventListener('load', initGame["loadHandler"], false);
+                        //inicia o jogo
+                        game.gameState = game.PAUSED;
+                    }
                 }
             }
             const game = initGame["createGame"]();            
             const keyboardListener = initGame["createListener"]();
+
+            //imagem-------------------------------------
+	        let img = new Image();
+            img.addEventListener('load', initGame["loadHandler"], false);
+            img.src = "../source/images/img.png";
+            game.assetsToLoad.push(img);
 
             keyboardListener.initHandleKeys(document);
             
@@ -32,7 +46,10 @@
                 console.log(`Player connected on Client with id: ${playerId}`)
 
                 const screen = document.getElementById('screen')
-                renderScreen(screen, game, requestAnimationFrame, playerId)
+                renderScreenLoop(screen, game, requestAnimationFrame, game.searchThing  ({
+                                                                                            playerId : playerId,
+                                                                                            arranjoEspec : game.players
+                                                                                        }), img)
             })
 
             socket.on('setup', (state) => {
