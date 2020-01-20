@@ -31,7 +31,12 @@ sockets.on('connection', (socket) => {
     socket.emit('setup', game)
 
     socket.on('disconnect', () => {
-        game.removePlayer({ playerId: playerId })
+        game.removePlayer({
+                            playerId: playerId ,
+                            objetoChar : game.searchThing( {   playerId : playerId,
+                                                                arranjoEspec : game.players 
+                                                            } )
+        })
         console.log(`> Player disconnected: ${playerId}`)
     })
 

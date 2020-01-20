@@ -35,7 +35,6 @@ var Sprite = function(sourceX,sourceY,width,height,x,y){
 	this.contadorDeLose = 0;
 	this.contadorDeWin = 0;
     this.indiceReal = 0;
-    this.indicePlayer = 0;
 }
 
 Sprite.prototype.centerX = function(){
@@ -132,6 +131,22 @@ const Game = function () {
     this.contPlayers = 0;
 }
 
+//remove os objetos do jogo 
+Game.prototype.removeObjects = function(objectOnRemove, array){
+	let i = array.indexOf(objectOnRemove);
+	if(i !== -1){
+		array.splice(i, 1);
+	}
+}
+Game.prototype.searchThing = function(command){
+    const playerId = command.playerId;
+    const arranjo = command.arranjoEspec;
+    for(let i in arranjo){
+        if(this.players[i].playerId === playerId){
+            return this.players[i]
+        }
+    }
+}
 Game.prototype.subscribe = function(observerFunction) {
     this.observers.push(observerFunction)
 }
@@ -147,17 +162,73 @@ Game.prototype.getState = function(newState) {
 }
 
 Game.prototype.addPlayer = function (command) {
-        const playerId = command.playerId
-        //personagem---------------------------------
-        let char = new Sprite(500,162,50,50,180,425);
-        char.playerId = playerId;
-        char.indicePlayer = this.contPlayers;
-        this.contPlayers ++;
-	    this.sprites.push(char);
-	    this.players.push(char);
+    const playerId = command.playerId
+    //personagem---------------------------------
+    let char = new Sprite(500,162,50,50,180,425);
+    char.playerId = playerId;
+    this.contPlayers ++;
+	this.sprites.push(char);
+    this.players.push(char);
+    
+    this.notifyAll({
+        type: 'add-player',
+        playerId: playerId,
+    })
+}
 
-        this.notifyAll({
-            type: 'add-player',
-            playerId: playerId,
-        })
+Game.prototype.removePlayer = function(command) {
+    const playerId = command.playerId
+    
+    let char = command.objetoChar
+    this.removeObjects(char, this.sprites)
+    this.removeObjects(char, this.players)
+    this.contPlayers --
+
+    this.notifyAll({
+        type: 'remove-player',
+        playerId: playerId,
+        objetoChar : this.searchThing( { playerId : playerId,
+                                          arranjoEspec : this.players 
+                                      } )
+    })
+}
+
+Game.prototype.movePlayer = function() {
+    notifyAll(command)
+
+    const acceptedMoves = {
+        ArrowUp(player) {
+            if (player.y - 1 >= 0) {
+                player.y = player.y - 1
+            }
+        },
+        ArrowRight(player) {
+            if (player.x + 1 < state.screen.width) {
+                player.x = player.x + 1
+            }
+        },
+        ArrowDown(player) {
+            if (player.y + 1 < state.screen.height) {
+                player.y = player.y + 1
+            }
+        },
+        ArrowLeft(player) {
+            if (player.x - 1 >= 0) {
+                player.x = player.x - 1
+            }
+        }
     }
+
+    const keyPressed = command.keyPressed
+    const playerId = command.playerId
+    const player = this.searchThing( { playerId : playerId,
+                                        arranjoEspec : this.players 
+                                    } )
+    const moveFunction = acceptedMoves[keyPressed]
+
+    if (player && moveFunction) {
+        moveFunction(player)
+        this.checkForFruitCollision(playerId)
+    }
+}
+

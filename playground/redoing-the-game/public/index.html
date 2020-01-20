@@ -15,12 +15,16 @@
             const initGame = {
                 createGame : () => {
                     return new Game();
+                },
+                createListener : () => {
+                    return new createKeyboardListener();
                 }
             }
             const game = initGame["createGame"]();            
-            const keyboardListener = createKeyboardListener(document)
-            
+            const keyboardListener = initGame["createListener"]();
 
+            keyboardListener.initHandleKeys(document);
+            
             const socket = io()
 
             socket.on('connect', () => {
