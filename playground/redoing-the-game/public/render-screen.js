@@ -1,4 +1,9 @@
 export default function renderScreenLoop(screen, game, requestAnimationFrame, char, img) {
+    const command = {
+                        type : 'verify-state',
+                        char : char
+                    }
+    game.notifyAll(command)
     const context = screen.getContext('2d')
     context.clearRect(0,0,screen.width,screen.height);
 	//itens gerais para todos os players

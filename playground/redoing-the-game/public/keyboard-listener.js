@@ -3,7 +3,7 @@ const createKeyboardListener = function () {
     this.playerId = null;
 }
 createKeyboardListener.prototype.initHandleKeys = function (document){
-    document.addEventListener('keydown', this.handleKeydown)
+    document.addEventListener('keyup', this.handleKeyup)
 }
 
 createKeyboardListener.prototype.registerPlayerId = function (playerId){
@@ -20,7 +20,7 @@ createKeyboardListener.prototype.notifyAll = function (command) {
     }
 }
 
-createKeyboardListener.prototype.handleKeydown = function (event) {
+createKeyboardListener.prototype.handleKeyup = function (event) {
     const keyPressed = event.key
 
     const command = {

@@ -3,6 +3,8 @@ import http from 'http'
 import createGame from './public/game.js'
 import socketio from 'socket.io'
 import Game from './public/objects.js'
+import initScene from './public/scenes/initScene.js'
+import opponents from './public/opponents/opponents.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -13,9 +15,17 @@ app.use(express.static('public'))
 const initGame = {
 	createGame : () => {
 		return new Game();
-	}
+    },
+    createInitScene : (game) => {
+        initScene(game);
+    },
+    createOpponents : (game) => {
+        opponents(game);
+    }
 }
 const game = initGame["createGame"]();
+initGame["createInitScene"](game);
+initGame["createOpponents"](game);
 
 game.subscribe((command) => {
     console.log(`> Emitting ${command.type}`)
