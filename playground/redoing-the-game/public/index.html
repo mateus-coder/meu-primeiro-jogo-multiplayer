@@ -92,6 +92,10 @@
                 console.log(`Receiving ${command.type} -> ${command.fruitId}`)
                 game.removeFruit(command)
             })
+
+            socket.on('verify-state', (command) => {
+                game.verifyStateGame(command.char);
+            })
         </script>
     </body>
 </html>

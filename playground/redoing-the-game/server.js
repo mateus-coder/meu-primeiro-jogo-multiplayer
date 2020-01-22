@@ -56,6 +56,10 @@ sockets.on('connection', (socket) => {
         
         game.movePlayer(command)
     })
+
+    socket.on('verify-state', (command) => {
+        game.verifyStateGame(command.char);
+    })
 })
 
 server.listen(3000, () => {
