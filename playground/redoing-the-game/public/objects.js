@@ -269,7 +269,7 @@ LifeIcons.prototype = Object.create(Sprite.prototype);
 
 //game
 export const Game = function () {
-    //estados do game
+    //estados do game//
 	this.LOADING = 0;
 	this.PLAYING = 1;
 	this.PAUSED = 2;
