@@ -1,5 +1,6 @@
 import { colliding, collidingInimigo } from './collisions/colliding'
 import collide from './collisions/collide'
+import { createSceneLose, createScenePause, createSceneWin } from './scenes/otherScenes'
 
 export var Sprite = function(sourceX,sourceY,width,height,x,y){
 	this.sourceX = sourceX;
@@ -273,7 +274,8 @@ export const Game = function () {
 	this.PLAYING = 1;
 	this.PAUSED = 2;
 	this.OVER = 3;
-	this.gameState = this.LOADING;
+    this.gameState = this.PLAYING;
+    this.init = false;
 	//arranjos de objetos do game
 	this.sprites = [];
 	this.players = [];
@@ -458,8 +460,8 @@ Game.prototype.movePlayer = function(command) {
         Enter(info) {
             let { player } = info;
             if(this.gameState !== this.OVER){
-				this.gameState !== this.PLAYING ? this.gameState = this.PLAYING : 
-				this.gameState = this.PAUSED;
+				//this.gameState !== this.PLAYING ? this.gameState = this.PLAYING : 
+				//this.gameState = this.PAUSED;
 				player.gameState !== "PLAYING" ? player.gameState = "PLAYING" : 
 				player.gameState = "PAUSED";
 			}
@@ -632,7 +634,7 @@ Game.prototype.verifyStateGame = function (char) {
 			console.log('LOADING...');
 			break;
 		case this.PLAYING:
-			this.update(char);
+			
 			break;
 		case this.OVER:
 			break;
@@ -645,27 +647,38 @@ Game.prototype.verifyStateGame = function (char) {
 			char.contadorDePausa === 1 ? this.createScenePause(true) : this.updatePause();
 		},
 		PLAYING : () => {
-			//update();
+            //update();
+            this.update(char);
 			char.contadorDePausa = 0;
-			
 		},
 		WIN : () => {
 			char.status = "INVISIBLE";
 			//removeInvisibleObjects(game.sprites, game.players);
 			this.gameState = this.OVER;
 			char.contadorDeWin += 1;
-			char.contadorDeWin === 1 ? this.createSceneWin() : this.updateWin();
+			char.contadorDeWin === 1 ? createSceneWin({
+                game : this,
+                char : char               
+            })
+             : this.updateWin();
 		},
 		LOSE : () => {
 			char.status = "INVISIBLE";
 			//removeInvisibleObjects(game.sprites, game.players);
 			this.gameState = this.OVER;
 			char.contadorDeLose += 1;
-			char.contadorDeLose === 1 ? char.createSceneLose() : char.updateLose();
+			char.contadorDeLose === 1 ? createSceneLose({
+                char : char
+            })
+             : char.updateLose();
 		},
 		INIT : () => {
 			char.contadorDePausa += 1;
-			char.contadorDePausa === 1 ? char.createScenePause(false) : char.updatePause(this);
+			char.contadorDePausa === 1 ? createScenePause({
+                pause : false,
+                char : char
+            })
+             : char.updatePause(this);
 			
 		}
 	}

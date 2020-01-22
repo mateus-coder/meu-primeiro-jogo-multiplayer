@@ -23,8 +23,7 @@
                     game.loadedAssets++;
                     if(game.loadedAssets === game.assetsToLoad.length){
                         img.removeEventListener('load', initGame["loadHandler"], false);
-                        //inicia o jogo
-                        game.gameState = game.PAUSED;
+                        game.init = true;
                     }
                 }
             }
@@ -54,7 +53,9 @@
 
             socket.on('setup', (state) => {
                 const playerId = socket.id
-                game = game.getState(state)
+                while(!game.init){
+                    game = game.getState(state)
+                }
 
                 keyboardListener.registerPlayerId(playerId)
                 keyboardListener.subscribe(game.movePlayer)
@@ -83,15 +84,15 @@
                 }
             })
 
-            socket.on('add-fruit', (command) => {
-                console.log(`Receiving ${command.type} -> ${command.fruitId}`)
-                game.addFruit(command)
-            })
+            //socket.on('add-fruit', (command) => {
+              //  console.log(`Receiving ${command.type} -> ${command.fruitId}`)
+                //game.addFruit(command)
+            //})
 
-            socket.on('remove-fruit', (command) => {
-                console.log(`Receiving ${command.type} -> ${command.fruitId}`)
-                game.removeFruit(command)
-            })
+            //socket.on('remove-fruit', (command) => {
+              //  console.log(`Receiving ${command.type} -> ${command.fruitId}`)
+                //game.removeFruit(command)
+            //})
 
             socket.on('verify-state', (command) => {
                 game.verifyStateGame(command.char);
