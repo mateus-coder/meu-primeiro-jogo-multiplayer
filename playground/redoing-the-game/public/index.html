@@ -10,11 +10,12 @@
         <script type="module">
             import createKeyboardListener from './keyboard-listener.js'
             import renderScreenLoop from './render-screen.js'
-            import Game from './game.js'
+            import Game, { setState } from './game.js'
+            
 
             const initGame = {
                 createGame : () => {
-                    return new Game();
+                    return new Game(new Array,new Array,new Array,new Array,new Array);
                 },
                 createListener : () => {
                     return new createKeyboardListener();
@@ -50,8 +51,8 @@
 
             socket.on('setup', (state) => {
                 const playerId = socket.id
-                //game = game.getState(state)
-
+                let { sprites, players, frutas, cenario, inimigos } = state;
+                game = new setState(sprites, players, frutas, cenario, inimigos);
                 keyboardListener.registerPlayerId(playerId)
                 keyboardListener.subscribe(game.movePlayer)
                 keyboardListener.subscribe((command) => {

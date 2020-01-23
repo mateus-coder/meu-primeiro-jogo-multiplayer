@@ -13,7 +13,7 @@ app.use(express.static('public'))
 
 const initGame = {
 	createGame : () => {
-		return new Game();
+		return new Game(new Array,new Array,new Array,new Array,new Array);
     },
     createInitScene : (game) => {
         initScene(game);

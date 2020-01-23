@@ -1,7 +1,7 @@
 import { createSceneLose, createScenePause, createSceneWin } from './scenes/otherScenes.js'
 import { Sprite, LifeIcons } from './objects.js'
 //game
-export default function Game () {
+export default function Game (sprites, players, frutas, cenario, inimigos) {
     //estados do game//
 	this.LOADING = 0;
 	this.PLAYING = 1;
@@ -10,15 +10,15 @@ export default function Game () {
     this.gameState = this.PLAYING;
     this.init = false;
 	//arranjos de objetos do game
-	this.sprites = [];
-	this.players = [];
+	this.sprites = sprites;
+	this.players = players;
 	this.assetsToLoad = [];
 	this.tiposDeInimigosSourceY = [212,       312,      362 ];
 	this.posicoesIniciaisInimigosY = [350,    200,      425];
 	this.posicoesIniciaisInimigosX = [280,    280,      30];
-	this.frutas = [];
-	this.inimigos = [];
-	this.cenario = [];
+	this.frutas = frutas;
+	this.inimigos = inimigos;
+	this.cenario = cenario;
 	//estado do jogo finalizado ? 
 	this.end = false;
 	//contador de recursos
@@ -96,9 +96,11 @@ Game.prototype.notifyAll = function(command) {
     }
 }
 
-Game.prototype.getState = function(newState) {
-    return newState;
+export var setState = function(sprites, players, frutas, cenario, inimigos) {
+    Game.call(this, sprites, players, frutas, cenario, inimigos);
+    this.normal = "";
 }
+setState.prototype = Object.create(Game.prototype);
 
 Game.prototype.addPlayer = function (command) {
     const playerId = command.playerId
