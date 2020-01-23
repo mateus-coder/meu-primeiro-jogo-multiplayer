@@ -1,7 +1,7 @@
-import Sprite from '../objects'
-import { Classification, playerPosition, lookPodium } from '../classification'
+import { Sprite } from '../objects.js'
+import { Classification, playerPosition, lookPodium } from '../classification.js'
 
-export default createSceneWin = (info) => {
+export const createSceneWin = (info) => {
     let { game, char } = info;
     let tableList = Classification(info);
     tableList["position"] = playerPosition(tableList);
@@ -12,7 +12,7 @@ export default createSceneWin = (info) => {
 }
 
 
-export default createSceneLose = (info) => {
+export const createSceneLose = (info) => {
     let { char } = info;
 	let backgroundLose = new Sprite(2306,163,500,550,0,0);
 	char.sprites.push(backgroundLose);
@@ -20,7 +20,7 @@ export default createSceneLose = (info) => {
 }
 
 
-export default createScenePause = (info) => {
+export const createScenePause = (info) => {
     let { pause, char } = info;
 	let backgroundPause;
 	pause ? backgroundPause = new Sprite(1803,161,500, 550, 0, 0) : backgroundPause = new Sprite(1000,161,500, 550, 0, 0);

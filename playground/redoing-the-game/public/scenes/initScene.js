@@ -1,7 +1,7 @@
 import { Sprite, SpriteDynamic }  from '../objects.js'
-import Scene from './sceneModels.js'
+import { Scene } from './sceneModels.js'
 
-export default initScene = function(game) {
+export default function initScene (game) {
     //fundo -----------------------------------
     let background = new Sprite(0, 162,500, 550, 0, 0);
     game.sprites.push(background);

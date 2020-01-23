@@ -1,7 +1,7 @@
 import express from 'express'
 import http from 'http'
 import socketio from 'socket.io'
-import Game from './public/objects.js'
+import Game from './public/game.js'
 import initScene from './public/scenes/initScene.js'
 import opponents from './public/opponents/opponents.js'
 
@@ -22,7 +22,7 @@ const initGame = {
         opponents(game);
     }
 }
-const game = initGame["createGame"]();
+let game = initGame["createGame"]();
 initGame["createInitScene"](game);
 initGame["createOpponents"](game);
 

@@ -1,6 +1,6 @@
-import { Sprite } from "./objects";
+import { Sprite } from "./objects.js";
 
-export default Classification = (info) => {
+export const Classification = (info) => {
     let { game, char } = info;
     let vencedor = segundo = terceiro = maiorPontuador = char;
 	let classification = [];
@@ -33,7 +33,7 @@ export default Classification = (info) => {
             };
 }
 
-export default playerPosition = (info) => {
+export const playerPosition = (info) => {
     let { classification, char } = info;
     let positionClassificationUser = 0;
     for(let play in classification){
@@ -42,11 +42,11 @@ export default playerPosition = (info) => {
     return positionClassificationUser + 1;
 }
 
-export default lookClassification  = (info) => {
+export const lookClassification  = (info) => {
 
 }
 
-export default lookPodium = (info) => {
+export const lookPodium = (info) => {
     let { classification, position, game } = info;
     let positionPodiumY = [200, 300, 400];
     let positionPodiumX = [50, 200, 350];

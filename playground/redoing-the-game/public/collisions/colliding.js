@@ -1,4 +1,4 @@
-import collide from './collide.js'
+import { collide } from './collide.js'
 
 export const colliding = {
 	collideTop : (info) => {

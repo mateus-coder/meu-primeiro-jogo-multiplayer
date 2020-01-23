@@ -17,7 +17,8 @@ export default function renderScreenLoop(screen, game, requestAnimationFrame, ch
                 context.drawImage(img,spr.sourceX,spr.sourceY,spr.width,spr.height,Math.floor(spr.x),Math.floor(spr.y),spr.width,spr.height)
 			}
 		}
-	}
+    }
+    console.log(char);
 	//itens específicos de cada player
 	if(char.sprites.length !== 0){
 		for(let gameSprite in char.sprites){

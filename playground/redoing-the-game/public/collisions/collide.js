@@ -1,4 +1,4 @@
-export default function collide(s1, s2){
+export const collide = (s1, s2) => {
     var hit = false;
 
     //calcular distância entre os centros dos sprites

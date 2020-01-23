@@ -1,4 +1,4 @@
-const createKeyboardListener = function () {
+export default function createKeyboardListener () {
     this.observers = [];
     this.playerId = null;
 }
