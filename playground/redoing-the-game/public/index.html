@@ -10,7 +10,7 @@
         <script type="module">
             import createKeyboardListener from './keyboard-listener.js'
             import renderScreenLoop from './render-screen.js'
-            import Game, { setState } from './game.js'
+            import Game from './game.js'
             
 
             const initGame = {
@@ -34,7 +34,7 @@
             //imagem-------------------------------------
 	        let img = new Image();
             img.addEventListener('load', initGame["loadHandler"], false);
-            img.src = "../source/images/img.png";
+            img.src = "./source/images/img.png";
             game.assetsToLoad.push(img);
 
             keyboardListener.initHandleKeys(document);
@@ -52,10 +52,18 @@
             socket.on('setup', (state) => {
                 const playerId = socket.id
                 let { sprites, players, frutas, cenario, inimigos } = state;
-                game = new setState(sprites, players, frutas, cenario, inimigos);
+                game = new Game(sprites, players, frutas, cenario, inimigos);
+
+                game.subscribe ( (command) => {
+                    socket.emit(command.type, command)
+                })
+
                 keyboardListener.registerPlayerId(playerId)
-                keyboardListener.subscribe(game.movePlayer)
+                keyboardListener.subscribe( (command) => {
+                    game.movePlayer(command)
+                } )
                 keyboardListener.subscribe((command) => {
+                    console.log("segunda");
                     socket.emit('move-player', command)
                 })
                 const screen = document.getElementById('screen')
@@ -96,6 +104,7 @@
             //})
 
             socket.on('verify-state', (command) => {
+                console.log("verify 1")
                 game.verifyStateGame(command.char);
             })
         </script>

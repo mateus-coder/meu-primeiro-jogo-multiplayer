@@ -33,7 +33,7 @@ export default function Game (sprites, players, frutas, cenario, inimigos) {
 	this.contadorDeTempo = 60;
     this.delayMudancaDeCor = 0;
     //funções observadoras
-    this.observers = [];
+    this.observers =[];
     //quantidade de jogadores 
     this.contPlayers = 0;
 }
@@ -96,12 +96,6 @@ Game.prototype.notifyAll = function(command) {
     }
 }
 
-export var setState = function(sprites, players, frutas, cenario, inimigos) {
-    Game.call(this, sprites, players, frutas, cenario, inimigos);
-    this.normal = "";
-}
-setState.prototype = Object.create(Game.prototype);
-
 Game.prototype.addPlayer = function (command) {
     const playerId = command.playerId
     //personagem---------------------------------
@@ -147,8 +141,9 @@ Game.prototype.removePlayer = function(command) {
 }
 
 Game.prototype.movePlayer = function(command) {
-    notifyAll(command)
-    
+    console.log("primeira");
+    //let { objeto } = command
+    this.notifyAll(command)
     const acceptedMoves = {
         ArrowUp(info) {
             let { player } = info;
@@ -193,8 +188,8 @@ Game.prototype.movePlayer = function(command) {
 			player.x += 5;
         },
         Enter(info) {
-            let { player } = info;
-            if(this.gameState !== this.OVER){
+            let { player, ctxGame } = info;
+            if(ctxGame.gameState !== ctxGame.OVER){
 				//this.gameState !== this.PLAYING ? this.gameState = this.PLAYING : 
 				//this.gameState = this.PAUSED;
 				player.gameState !== "PLAYING" ? player.gameState = "PLAYING" : 
@@ -212,7 +207,8 @@ Game.prototype.movePlayer = function(command) {
     const info = {
         player : player,
         cenario : this.cenario,
-        desconto : 5
+        desconto : 5,
+        ctxGame : this
     }
     const moveFunction = acceptedMoves[keyPressed]
 
@@ -362,6 +358,7 @@ Game.prototype.updateWin = function () {
 }
 
 Game.prototype.verifyStateGame = function (char) {
+    console.log("ta chengando aquio no verify")
     this.contadorDeTempo === this.delayMudancaDeCor ? this.Animations(char) : this.delayMudancaDeCor++;
 	//define as ações com base no estado do jogo
 	switch(this.gameState){

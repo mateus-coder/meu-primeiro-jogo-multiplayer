@@ -265,4 +265,3 @@ export var LifeIcons = function(sourceX, sourceY, width, height, x, y){
 	Sprite.call(this, sourceX, sourceY, width, height, x, y);
 }
 LifeIcons.prototype = Object.create(Sprite.prototype);
-

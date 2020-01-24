@@ -3,7 +3,13 @@ export default function createKeyboardListener () {
     this.playerId = null;
 }
 createKeyboardListener.prototype.initHandleKeys = function (document){
-    document.addEventListener('keyup', this.handleKeyup)
+    console.log(this.observers);
+    document.addEventListener('keyup', (e) => {
+        this.handleKeyup({
+            event : e,
+            objeto : this
+        })
+    })
 }
 
 createKeyboardListener.prototype.registerPlayerId = function (playerId){
@@ -20,14 +26,15 @@ createKeyboardListener.prototype.notifyAll = function (command) {
     }
 }
 
-createKeyboardListener.prototype.handleKeyup = function (event) {
+createKeyboardListener.prototype.handleKeyup = function (params) {
+    let { event, objeto } = params
     const keyPressed = event.key
 
     const command = {
         type: 'move-player',
-        playerId: this.playerId,
-        keyPressed
+        playerId: objeto.playerId,
+        keyPressed,
     }
 
-    this.notifyAll(command)
+    objeto.notifyAll(command)
 }

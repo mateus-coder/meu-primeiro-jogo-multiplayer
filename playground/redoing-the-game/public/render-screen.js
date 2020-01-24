@@ -18,7 +18,6 @@ export default function renderScreenLoop(screen, game, requestAnimationFrame, ch
 			}
 		}
     }
-    console.log(char);
 	//itens específicos de cada player
 	if(char.sprites.length !== 0){
 		for(let gameSprite in char.sprites){

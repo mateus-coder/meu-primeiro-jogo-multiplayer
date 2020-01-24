@@ -26,10 +26,12 @@ let game = initGame["createGame"]();
 initGame["createInitScene"](game);
 initGame["createOpponents"](game);
 
-game.subscribe((command) => {
+const emit = (command) => {
     console.log(`> Emitting ${command.type}`)
     sockets.emit(command.type, command)
-})
+}
+
+game.subscribe(emit)
 
 sockets.on('connection', (socket) => {
     const playerId = socket.id
@@ -57,6 +59,7 @@ sockets.on('connection', (socket) => {
     })
 
     socket.on('verify-state', (command) => {
+        console.log("verify 2")
         game.verifyStateGame(command.char);
     })
 })
