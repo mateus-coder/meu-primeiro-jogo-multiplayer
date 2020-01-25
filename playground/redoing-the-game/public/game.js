@@ -1,5 +1,8 @@
 import { createSceneLose, createScenePause, createSceneWin } from './scenes/otherScenes.js'
 import { Sprite, LifeIcons } from './objects.js'
+import { collide } from './collisions/collide.js'
+import { colliding } from './collisions/colliding.js'
+import { gameAnimations, pauseAnimations } from './animations/animation.js'
 //game
 export default function Game (sprites, players, frutas, cenario, inimigos) {
     //estados do game//
@@ -30,8 +33,6 @@ export default function Game (sprites, players, frutas, cenario, inimigos) {
 		TOP : 38,
 		DOWN : 40,
 	};
-	this.contadorDeTempo = 60;
-    this.delayMudancaDeCor = 0;
     //funções observadoras
     this.observers =[];
     //quantidade de jogadores 
@@ -99,11 +100,46 @@ Game.prototype.notifyAll = function(command) {
 Game.prototype.addPlayer = function (command) {
     const playerId = command.playerId
     //personagem---------------------------------
-    let char = new Sprite(500,162,50,50,180,425);
+    let char = new Sprite( {
+								sourceX : 500,
+								sourceY : 162,
+								width : 50,
+								height : 50,
+								x : 180,
+								y : 425,
+								playerId : "",
+								status : "VISIBLE",
+								quantCollide : 0,
+								move : "STOP",
+								points : 0,
+								keyPressed : "mvNone",
+								loser : 0,
+								colisoes : 0,
+								gameState : "INIT",
+								lifeIcons : [],
+								sprites : [],
+								alimentosPaused : [],
+								scenePause : [],
+								sceneLose : [],
+								contadorDeLose : 0,
+								contadorDePausa : 0,
+								contadorDeWin : 0,
+								indiceReal : 0,
+								sceneInit : [],
+								contadorDeTempo : 0
+							} );
     char.playerId = playerId;
     this.contPlayers ++;
     for(let indice = 0; indice < 7; indice++){
-		let lifeIcon = new LifeIcons(112, 111, 50, 50, char.lifePositionX[indice], 500);
+		let lifeIcon = new LifeIcons( {
+										sourceX : 112,
+										sourceY : 111,
+										width : 50,
+										height : 50,
+										x : char.lifePositionX[indice],
+										y : 500,
+										status : "VISIBLE"
+									} );
 		char.lifeIcons.push(lifeIcon);
 		char.sprites.push(lifeIcon);
 	}
@@ -136,7 +172,7 @@ Game.prototype.removePlayer = function(command) {
         objetoChar : this.searchThing( { 
                                             playerId : playerId,
                                             arranjoEspec : this.players 
-                                      } )
+                                    } )
     })
 }
 
@@ -298,7 +334,7 @@ Game.prototype.update = function (char) {
 	this.leaveBorder({ 
                         inimigoType1 : char,
                         paused : 0
-     });
+    });
 	
 	char.collideWallChar(this.cenario);
 	char.collideCharFruit({
@@ -336,7 +372,8 @@ Game.prototype.setNewPosition = function (sprite){
 } 
 
 Game.prototype.ChangeBackground = function () {
-    this.delayMudancaDeCor = 0;
+	console.log(this + "changebackground");
+	this.delayMudancaDeCor = 0;
 	for(let i in this.sprites){
 		let sprite = this.sprites[i];
 		sprite.type === "DYNAMICBACKGROUND" ? this.setNewPosition(sprite) : this.delayMudancaDeCor++;
@@ -344,9 +381,27 @@ Game.prototype.ChangeBackground = function () {
 }
 
 Game.prototype.Animations = function (char) {
+	console.log("animations");
+	let { sourceX,sourceY,width,height,x,y,playerId,status, quantCollide,move,points,keyPressed,loser,colisoes,gameState,lifeIcons, sprites, alimentosPaused,scenePause,sceneLose,contadorDeLose,contadorDePausa, contadorDeWin, indiceReal, sceneInit, contadorDeTempo } = char
+	this.removeObjects({
+		objectOnRemove : char,
+		array : this.sprites
+	});
+	this.removeObjects({
+		objectOnRemove : char,
+		array : this.players
+	});
+	status = "verifica se o array alterou também"
+	char = new Sprite( {
+						sourceX,sourceY,width,height,x,y,playerId,status, quantCollide,move,points,keyPressed,loser,colisoes,gameState,lifeIcons, sprites, alimentosPaused,scenePause,sceneLose,contadorDeLose,contadorDePausa, contadorDeWin, indiceReal, sceneInit, contadorDeTempo
+					} );
+	
     this.ChangeBackground();
 	char.ChangeChar();
 	char.ChangeLife();
+	this.sprites.push(char)
+	this.players.push(char)
+	return char
 }
 
 Game.prototype.setAnimationWin = function () {
@@ -358,8 +413,18 @@ Game.prototype.updateWin = function () {
 }
 
 Game.prototype.verifyStateGame = function (char) {
-    console.log("ta chengando aquio no verify")
-    this.contadorDeTempo === this.delayMudancaDeCor ? this.Animations(char) : this.delayMudancaDeCor++;
+	let newSprites = 0;
+	let { updatePause } = pauseAnimations
+	if(char.contadorDeTempo % 60 == 0){
+		newSprites = gameAnimations["AnimationsInit"]({
+			char,
+			game : this
+		})
+	}
+	else{
+		char.contadorDeTempo++;
+	}
+	
 	//define as ações com base no estado do jogo
 	switch(this.gameState){
 		case this.LOADING:
@@ -376,7 +441,14 @@ Game.prototype.verifyStateGame = function (char) {
 	const playerGameState = {
 		PAUSED : () => {
 			char.contadorDePausa += 1;
-			char.contadorDePausa === 1 ? this.createScenePause(true) : this.updatePause();
+			char.contadorDePausa === 1 ? createScenePause({
+				pause : true,
+				char : char,
+				game : this
+			}) : updatePause({
+				game : this,
+				char : char
+			});
 		},
 		PLAYING : () => {
             //update();
@@ -392,7 +464,7 @@ Game.prototype.verifyStateGame = function (char) {
                 game : this,
                 char : char               
             })
-             : this.updateWin();
+            : this.updateWin();
 		},
 		LOSE : () => {
 			char.status = "INVISIBLE";
@@ -402,16 +474,19 @@ Game.prototype.verifyStateGame = function (char) {
 			char.contadorDeLose === 1 ? createSceneLose({
                 char : char
             })
-             : char.updateLose();
+            : char.updateLose();
 		},
 		INIT : () => {
 			char.contadorDePausa += 1;
 			char.contadorDePausa === 1 ? createScenePause({
                 pause : false,
-                char : char
+				char : char,
+				game : this
             })
-             : char.updatePause(this);
-			
+            : updatePause({
+				game : this,
+				char : char
+			});
 		}
 	}
 	playerGameState[`${char.gameState}`]();

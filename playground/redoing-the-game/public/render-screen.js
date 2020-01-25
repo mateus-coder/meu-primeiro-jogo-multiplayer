@@ -1,11 +1,13 @@
+
 export default function renderScreenLoop(screen, game, requestAnimationFrame, char, img) {
-    const command = {
-                        type : 'verify-state',
-                        char : char
-                    }
-    game.notifyAll(command)
+	const command = {
+		type : 'verify-state',
+		char : char
+	}
+	game.notifyAll(command)
     const context = screen.getContext('2d')
-    context.clearRect(0,0,screen.width,screen.height);
+	context.clearRect(0,0,screen.width,screen.height);
+	context.beginPath();
 	//itens gerais para todos os players
 	if(game.sprites.length !== 0){
 		for(let i in game.sprites){
@@ -27,8 +29,11 @@ export default function renderScreenLoop(screen, game, requestAnimationFrame, ch
 			}
 		}
 	}
-
-    requestAnimationFrame(() => {
-        renderScreenLoop(screen, game, requestAnimationFrame, char, img)
-    })
+	
+	requestAnimationFrame(() => {
+		game.verifyStateGame(char);
+		renderScreenLoop(screen, game, requestAnimationFrame, char, img);
+	})
+    
+	
 }

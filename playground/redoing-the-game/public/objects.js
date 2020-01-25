@@ -1,7 +1,9 @@
 import { colliding, collidingInimigo } from './collisions/colliding.js'
 import { collide } from './collisions/collide.js'
 
-export var Sprite = function(sourceX,sourceY,width,height,x,y){
+export var Sprite = function(props){
+	let { sourceX,sourceY,width,height,x,y,playerId,status, quantCollide,move,points,keyPressed,loser,colisoes,gameState,lifeIcons, sprites, alimentosPaused,scenePause,sceneLose,contadorDeLose,contadorDePausa, contadorDeWin, indiceReal, sceneInit, contadorDeTempo } = props
+
 	this.sourceX = sourceX;
 	this.sourceY = sourceY;
 	this.width = width;
@@ -10,34 +12,36 @@ export var Sprite = function(sourceX,sourceY,width,height,x,y){
 	this.y = y;
 	this.vx = 5;
     this.vy = 0;
-    this.playerId = "";
-	this.status = "VISIBLE";
+    this.playerId = playerId;
+	this.status = status;
 	this.type = "STATIC";
-	this.quantCollide = 0;
-	this.move = "STOP";
+	this.quantCollide = quantCollide;
+	this.move = move;
 	this.positionX = x;
 	this.positionY = y;
 	this.collideTrueOrFalse = false;
 	this.collideTrueOrFalseAllScene = false;
-	this.points = 0;
-	this.keyPressed = "mvNone";
-	this.loser = 7;
-	this.colisoes = 0;
-	this.gameState = "INIT";
+	this.points = points;
+	this.keyPressed = keyPressed;
+	this.loser = loser;
+	this.colisoes = colisoes;
+	this.gameState = gameState; //"INIT"
 	this.optionsRoutes = ["LEFT", "RIGHT", "DOWN", "TOP"];
-	this.lifeIcons = []; //vidas
+	this.lifeIcons = lifeIcons; //vidas
 	this.lifePositionX = [0,50,100,150,200, 250];
-	this.sprites = []; //itens que devem ser exibidos especificamente para cada usuário
-	this.alimentosPaused = [];
-	this.scenePause = [];
-	this.sceneLose = [];
+	this.sprites = sprites; //itens que devem ser exibidos especificamente para cada usuário
+	this.alimentosPaused = alimentosPaused;
+	this.sceneInit = sceneInit;
+	this.scenePause = scenePause;
+	this.sceneLose = sceneLose;
 	this.alimentosPausedX = [0,50,100,150,211,260];
 	this.alimentosPausedPositionY = [0,50,100,150,211,260];
 	this.alimentosPausedPositionX = [0,100,200,300,400,500];
-	this.contadorDePausa = 0;
-	this.contadorDeLose = 0;
-	this.contadorDeWin = 0;
-    this.indiceReal = 0;
+	this.contadorDePausa = contadorDePausa;
+	this.contadorDeLose = contadorDeLose;
+	this.contadorDeWin = contadorDeWin;
+	this.indiceReal = indiceReal;
+	this.contadorDeTempo = contadorDeTempo;
 }
 
 Sprite.prototype.centerX = function(){
@@ -148,7 +152,13 @@ Sprite.prototype.collideCharInimigos = function (info) {
 			inimigos[ini].status = "INVISIBLE";
 			this.changeSkin("ENGORDA");
 			for(let ç = 0; ç < 1; ç++){
-				let inimigo = new InimigoObj(750,game.tiposDeInimigosSourceY[ç],50,50,game.posicoesIniciaisInimigosX[ç],game.posicoesIniciaisInimigosY[ç]);
+				let inimigo = new InimigoObj( {
+												sourceX : 750,
+												sourceY : game.tiposDeInimigosSourceY[ç],
+												width : 50,
+												height : 50,
+												x : game.posicoesIniciaisInimigosX[ç],y : game.posicoesIniciaisInimigosY[ç]
+											} );
 				game.sprites.push(inimigo);
 				game.inimigos.push(inimigo);
 			}
@@ -157,6 +167,7 @@ Sprite.prototype.collideCharInimigos = function (info) {
 }
 
 Sprite.prototype.ChangeChar = function () {
+	console.log("change char");
     this.sourceX === 700 ? this.setSourceX(this, 500) : this.setSourceX(this, this.sourceX + 50);
 }
 
@@ -168,8 +179,8 @@ Sprite.prototype.ChangeLife = function () {
 }
 
 //updates 
-Sprite.prototype.updatePause = function (game) {
-	this.setAnimationPaused(game);
+Sprite.prototype.updatePause = function (info) {
+	this.setAnimationPaused(info);
 }
 Sprite.prototype.updateLose =  function (){
 	this.setAnimationLose();
@@ -183,18 +194,19 @@ Sprite.prototype.setReverseAnimation = function (info) {
 	alimento.x = positX;
 }
 
-Sprite.prototype.setAnimationPaused = function (game)  {
-	for(let obj in this.alimentosPaused){
-		let alimento = this.alimentosPaused[obj];
+Sprite.prototype.setAnimationPaused = function (info)  {
+	let { game, char } = info
+	for(let obj in char.alimentosPaused){
+		let alimento = char.alimentosPaused[obj];
 		alimento.vy = 2;
 		const velocidadeX = alimento.vx;
 		const positionX = alimento.x;
-		this.contadorDePausa % 5 === 0 ?
+		char.contadorDePausa % 5 === 0 ?
 		game.leaveBorder({
                             inimigoType1 : alimento,
                             paused : 50
                         }) ?
-        this.setReverseAnimation({
+        char.setReverseAnimation({
             alimento : alimento,
             veloX : velocidadeX,
             positX : positionX
@@ -210,29 +222,17 @@ Sprite.prototype.setAnimationPaused = function (game)  {
 Sprite.prototype.setAnimationLose = function ()  {
 	this.contadorDeLose % 30 === 0 && this.sceneLose[0].sourceX < 4200 ? this.setSourceX(this.sceneLose[0], this.sceneLose[0].sourceX + 500 ) : this.contadorDeLose *= 1;
 }
-//classe alien(inimigo);
-export var Alien = function(sourceX,sourceY,width,height,x,y){
-	//comando que significa que eu estou passando para esta classe as variáveis de instância da classe Sprite
-	Sprite.call(this, sourceX,sourceY,width,height,x,y);
-	this.NORMAL = 1;
-	this.EXPLODED = 2;
-	this.CRAZY = 3;
-	this.state = this.NORMAL;
-	this.mvStyle = this.NORMAL;
-}
-//passando todos os métodos da classe Sprite para esta classe
-Alien.prototype = Object.create(Sprite.prototype);
-
-Alien.prototype.explode = function(){
-	this.sourceX = 110;
-	this.width = 70;
-	this.height = 55;
-}
-
 //classe muro
 
-export var SpriteDynamic =  function(sourceX ,sourceY ,width ,height ,x ,y) {
-	Sprite.call( this, sourceX ,sourceY ,width ,height ,x ,y );
+export var SpriteDynamic =  function(props) {
+	let { sourceX ,sourceY ,width ,height ,x ,y, status } = props
+	this.sourceX = sourceX;
+	this.sourceY = sourceY;
+	this.width = width;
+	this.height = height;
+	this.x = x;
+	this.y = y;
+	this.status = status;
 	this.type = "DYNAMICBACKGROUND";
 	this.moreOrLess = 1;
 	this.animation = false;
@@ -240,7 +240,8 @@ export var SpriteDynamic =  function(sourceX ,sourceY ,width ,height ,x ,y) {
 SpriteDynamic.prototype = Object.create(Sprite.prototype);
 
 
-export var InimigoObj = function(sourceX ,sourceY ,width ,height ,x ,y){
+export var InimigoObj = function(props){
+	let { sourceX ,sourceY ,width ,height ,x ,y } = props
 	Sprite.call(this, sourceX ,sourceY ,width ,height ,x ,y );
 	this.state = "NORMAL";
 	this.status = "VISIBLE";
@@ -261,7 +262,23 @@ InimigoObj.prototype.moveInimigo = function (info) {
 	}
 }
 //lifeIcons 
-export var LifeIcons = function(sourceX, sourceY, width, height, x, y){
-	Sprite.call(this, sourceX, sourceY, width, height, x, y);
+export var LifeIcons = function(props){
+	let { sourceX, sourceY, width, height, x, y, status } = props
+	Sprite.call(this, sourceX, sourceY, width, height, x, y, status);
 }
 LifeIcons.prototype = Object.create(Sprite.prototype);
+
+export var SceneClass = function (props) {
+	let { sourceX, sourceY, width, height, x, y, status } = props
+	this.sourceX = sourceX;
+	this.sourceY = sourceY;
+	this.width = width;
+	this.height = height;
+	this.x = x;
+	this.y = y;
+	this.status = status;
+	this.vx = 5;
+	this.vy = 0;
+}
+
+SceneClass.prototype = Object.create(Sprite.prototype);

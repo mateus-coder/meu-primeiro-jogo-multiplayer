@@ -53,6 +53,13 @@
                 const playerId = socket.id
                 let { sprites, players, frutas, cenario, inimigos } = state;
                 game = new Game(sprites, players, frutas, cenario, inimigos);
+                
+                let char = game.searchThing  ({                                                                            playerId : playerId,
+                                                    arranjoEspec : game.players
+                                })
+                for(let i in game.cenario){
+                    char.sprites.push(game.cenario[i]);
+                }
 
                 game.subscribe ( (command) => {
                     socket.emit(command.type, command)
@@ -63,14 +70,11 @@
                     game.movePlayer(command)
                 } )
                 keyboardListener.subscribe((command) => {
-                    console.log("segunda");
                     socket.emit('move-player', command)
                 })
-                const screen = document.getElementById('screen')
-                renderScreenLoop(screen, game, requestAnimationFrame, game.searchThing  ({
-                                                                                            playerId : playerId,
-                                                                                            arranjoEspec : game.players
-                                                                                        }), img);
+                const screen = document.querySelector('#screen');
+                
+		        renderScreenLoop(screen, game, requestAnimationFrame, char, img)
             })
 
             socket.on('add-player', (command) => {
@@ -87,6 +91,12 @@
                 console.log(`Receiving ${command.type} -> ${command.playerId}`)
 
                 const playerId = socket.id
+                let char = game.searchThing({
+                                                playerId : playerId,
+                                                arranjoEspec : game.players
+                                        })
+                console.log("verificar player-state " + char.gameState)
+                cancelAnimationFrame(requestAnimationFrame);
 
                 if (playerId !== command.playerId) {
                     game.movePlayer(command)
@@ -102,11 +112,6 @@
               //  console.log(`Receiving ${command.type} -> ${command.fruitId}`)
                 //game.removeFruit(command)
             //})
-
-            socket.on('verify-state', (command) => {
-                console.log("verify 1")
-                game.verifyStateGame(command.char);
-            })
         </script>
     </body>
 </html>
